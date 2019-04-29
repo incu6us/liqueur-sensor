@@ -4,12 +4,14 @@
 #define CE_PIN 3
 #define CSN_PIN 3 //Since we are using 3 pin configuration we will use same pin for both CE and CSN
 
-#include "RF24.h"
+#include <nRF24L01.h>
+#include <RF24_config.h>
+#include <RF24.h>
 
 RF24 radio(CE_PIN, CSN_PIN);
 
 byte address[11] = "SimpleNode";
-unsigned long payload = 0;
+unsigned long data = 0;
 
 void setup()
 {
@@ -22,10 +24,10 @@ void setup()
   pinMode(4, OUTPUT);
 }
 
-void loop()
+void loop(void)
 {
-  int X = analogRead(3);
-  if (X < 614)
+  data = analogRead(3);
+  if (data < 614)
   {
     digitalWrite(4, HIGH);
     delay(200);
@@ -36,6 +38,6 @@ void loop()
     digitalWrite(4, HIGH);
   }
 
-  radio.write(&X, sizeof(unsigned long));
+  // radio.write(&data, sizeof(unsigned long));
   delay(200);
 }
