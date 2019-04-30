@@ -1,43 +1,97 @@
-
+#include <avr/sleep.h>
+#include <avr/interrupt.h>
+#include <avr/wdt.h>
 #include <Arduino.h>
+#include <liqueur.h>
 
-#define CE_PIN 3
-#define CSN_PIN 3 //Since we are using 3 pin configuration we will use same pin for both CE and CSN
+#ifdef CRITICAL_VOLTAGE_LEVEL
+static int const min_voltage_level = CRITICAL_VOLTAGE_LEVEL;
+#else
+static int const min_voltage_level = 390;
+#endif
 
-#include <nRF24L01.h>
-#include <RF24_config.h>
-#include <RF24.h>
+#ifdef VOLTAGE_INDICATOR
+static unsigned int const voltage_indicator = VOLTAGE_INDICATOR;
+#else
+static unsigned int const voltage_indicator = 3;
+#endif
 
-RF24 radio(CE_PIN, CSN_PIN);
+#ifdef WATER_INDICATOR
+static unsigned int const water_indicator = WATER_INDICATOR;
+#else
+static unsigned int const water_indicator = 2;
+#endif
 
-byte address[11] = "SimpleNode";
-unsigned long data = 0;
+#ifdef BUZZER
+static unsigned int const buzzer = BUZZER;
+#else
+static unsigned int const buzzer = 0;
+#endif
+
+#ifdef LED
+static unsigned int const led = LED;
+#else
+static unsigned int const led = 4;
+#endif
+
+void startGreeting()
+{
+  digitalWrite(led, HIGH);
+  digitalWrite(buzzer, HIGH);
+  delay(50);
+  digitalWrite(led, LOW);
+  digitalWrite(buzzer, LOW);
+  delay(50);
+}
+
+void lowVoltageAlarm()
+{
+  digitalWrite(led, HIGH);
+  digitalWrite(buzzer, HIGH);
+  delay(100);
+  digitalWrite(led, LOW);
+  digitalWrite(buzzer, LOW);
+  delay(100);
+}
+
+void waterAlarm()
+{
+  digitalWrite(led, HIGH);
+  digitalWrite(buzzer, HIGH);
+  delay(500);
+  digitalWrite(led, LOW);
+  digitalWrite(buzzer, LOW);
+  delay(200);
+}
+
+bool isStarted;
 
 void setup()
 {
-  radio.begin();                  // Start up the radio
-  radio.setAutoAck(1);            // Ensure autoACK is enabled
-  radio.setRetries(15, 15);       // Max delay between retries & number of retries
-  radio.openWritingPipe(address); // Write to device address 'SimpleNode'
+  pinMode(voltage_indicator, INPUT);
+  pinMode(water_indicator, INPUT);
 
-  // initialize pin 4 (ATtiny leg 3) as an output.
-  pinMode(4, OUTPUT);
+  pinMode(buzzer, OUTPUT);
+  pinMode(led, OUTPUT);
 }
 
 void loop(void)
 {
-  data = analogRead(3);
-  if (data < 614)
+  if (!isStarted)
   {
-    digitalWrite(4, HIGH);
-    delay(200);
-    digitalWrite(4, LOW);
-  }
-  else
-  {
-    digitalWrite(4, HIGH);
+    startGreeting();
+    isStarted = true;
   }
 
-  // radio.write(&data, sizeof(unsigned long));
-  delay(200);
+  int voltage = analogRead(voltage_indicator);
+  if (voltage < min_voltage_level)
+  {
+    lowVoltageAlarm();
+  }
+
+  int water = analogRead(water_indicator);
+  if (water > 100)
+  {
+    waterAlarm();
+  }
 }

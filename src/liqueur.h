@@ -1,0 +1,7 @@
+
+#define BUZZER 0
+#define LED 4
+#define VOLTAGE_INDICATOR 3
+#define WATER_INDICATOR 2
+
+#define CRITICAL_VOLTAGE_LEVEL 390
