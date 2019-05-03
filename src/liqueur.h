@@ -1,6 +1,4 @@
-
-#define BUZZER 0
-#define LED 4
+#define BUZZER 4
 #define VOLTAGE_INDICATOR 3
 #define WATER_INDICATOR 2
 

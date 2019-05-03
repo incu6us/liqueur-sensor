@@ -1,97 +1,73 @@
-#include <avr/sleep.h>
-#include <avr/interrupt.h>
-#include <avr/wdt.h>
 #include <Arduino.h>
 #include <liqueur.h>
 
 #ifdef CRITICAL_VOLTAGE_LEVEL
-static int const min_voltage_level = CRITICAL_VOLTAGE_LEVEL;
+static unsigned int const min_voltage_level = CRITICAL_VOLTAGE_LEVEL;
 #else
-static int const min_voltage_level = 390;
+static unsigned int const min_voltage_level = 390;
 #endif
 
 #ifdef VOLTAGE_INDICATOR
-static unsigned int const voltage_indicator = VOLTAGE_INDICATOR;
+static byte const voltage_indicator = VOLTAGE_INDICATOR;
 #else
-static unsigned int const voltage_indicator = 3;
+static byte const voltage_indicator = 3;
 #endif
 
 #ifdef WATER_INDICATOR
-static unsigned int const water_indicator = WATER_INDICATOR;
+static byte const water_indicator = WATER_INDICATOR;
 #else
-static unsigned int const water_indicator = 2;
+static byte const water_indicator = 2;
 #endif
 
 #ifdef BUZZER
-static unsigned int const buzzer = BUZZER;
+static byte const buzzer = BUZZER;
 #else
-static unsigned int const buzzer = 0;
+static byte const buzzer = 4;
 #endif
 
-#ifdef LED
-static unsigned int const led = LED;
-#else
-static unsigned int const led = 4;
-#endif
 
-void startGreeting()
-{
-  digitalWrite(led, HIGH);
-  digitalWrite(buzzer, HIGH);
-  delay(50);
-  digitalWrite(led, LOW);
-  digitalWrite(buzzer, LOW);
-  delay(50);
+void startGreeting() {
+    digitalWrite(buzzer, HIGH);
+    delay(50);
+    digitalWrite(buzzer, LOW);
+    delay(50);
 }
 
-void lowVoltageAlarm()
-{
-  digitalWrite(led, HIGH);
-  digitalWrite(buzzer, HIGH);
-  delay(100);
-  digitalWrite(led, LOW);
-  digitalWrite(buzzer, LOW);
-  delay(100);
+void lowVoltageAlarm() {
+    digitalWrite(buzzer, HIGH);
+    delay(50);
+    digitalWrite(buzzer, LOW);
+    delay(50);
 }
 
-void waterAlarm()
-{
-  digitalWrite(led, HIGH);
-  digitalWrite(buzzer, HIGH);
-  delay(500);
-  digitalWrite(led, LOW);
-  digitalWrite(buzzer, LOW);
-  delay(200);
+void waterAlarm() {
+    digitalWrite(buzzer, HIGH);
+    delay(1000);
+    digitalWrite(buzzer, LOW);
+    delay(200);
 }
 
 bool isStarted;
 
-void setup()
-{
-  pinMode(voltage_indicator, INPUT);
-  pinMode(water_indicator, INPUT);
+void setup() {
+    pinMode(voltage_indicator, INPUT);
+    pinMode(water_indicator, INPUT);
 
-  pinMode(buzzer, OUTPUT);
-  pinMode(led, OUTPUT);
+    pinMode(buzzer, OUTPUT);
 }
 
-void loop(void)
-{
-  if (!isStarted)
-  {
-    startGreeting();
-    isStarted = true;
-  }
+void loop(void) {
+    if (!isStarted) {
+        startGreeting();
+        isStarted = true;
+    }
 
-  int voltage = analogRead(voltage_indicator);
-  if (voltage < min_voltage_level)
-  {
-    lowVoltageAlarm();
-  }
+    unsigned int voltage = analogRead(voltage_indicator);
+    if (voltage < min_voltage_level) {
+        lowVoltageAlarm();
+    }
 
-  int water = analogRead(water_indicator);
-  if (water > 100)
-  {
-    waterAlarm();
-  }
+    if (digitalRead(water_indicator) == HIGH) {
+        waterAlarm();
+    }
 }
