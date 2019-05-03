@@ -30,24 +30,23 @@ void startGreeting() {
     digitalWrite(buzzer, HIGH);
     delay(50);
     digitalWrite(buzzer, LOW);
-    delay(50);
 }
 
 void lowVoltageAlarm() {
     digitalWrite(buzzer, HIGH);
-    delay(50);
+    delay(500);
     digitalWrite(buzzer, LOW);
-    delay(50);
+    delay(2000);
 }
 
 void waterAlarm() {
     digitalWrite(buzzer, HIGH);
-    delay(1000);
+    delay(50);
     digitalWrite(buzzer, LOW);
-    delay(200);
 }
 
 bool isStarted;
+bool hasWaterLeak;
 
 void setup() {
     pinMode(voltage_indicator, INPUT);
@@ -67,7 +66,10 @@ void loop(void) {
         lowVoltageAlarm();
     }
 
-    if (digitalRead(water_indicator) == HIGH) {
+    if (digitalRead(water_indicator) == HIGH || hasWaterLeak) {
+        hasWaterLeak = true;
         waterAlarm();
     }
+
+    delay(50);
 }

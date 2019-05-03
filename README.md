@@ -1,10 +1,3 @@
 # liqueur-sensor
 
-### Voltage to int mapping
-```
-3.9 -> 798
-3.6 - 3.9 -> 737 - 797
-3.3 - 3.6 -> 675 - 736
-3.0 - 3.3 -> 614 - 674
-2.7 - 3.0 -> 613 - 553
-```
+Firmware for water leakage sensor with low battery control based on Attiny13
